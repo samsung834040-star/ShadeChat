@@ -1,52 +1,66 @@
-let users = JSON.parse(localStorage.getItem("users")) || {};
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
-document.getElementById("registerBtn").onclick = function () {
-
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value.trim();
-    const msg = document.getElementById("msg");
-
-    if (username === "" || password === "") {
-        msg.innerText = "Username aur Password bhariye!";
-        return;
-    }
-
-    if (users[username]) {
-        msg.innerText = "Username pehle se hai!";
-        return;
-    }
-
-    users[username] = password;
-    localStorage.setItem("users", JSON.stringify(users));
-
-    msg.style.color = "green";
-    msg.innerText = "Account ban gaya!";
+const firebaseConfig = {
+  apiKey: "AIzaSyCkIDDZPZW2wUyxxYI8uN-lpGv58m0LTS8",
+  authDomain: "shade-85.firebaseapp.com",
+  projectId: "shade-85",
+  storageBucket: "shade-85.firebasestorage.app",
+  messagingSenderId: "370950187569",
+  appId: "1:370950187569:web:aa8f05b3ef8a0f1bd54310",
+  measurementId: "G-WJNJ2HEMLT"
 };
 
-document.getElementById("loginBtn").onclick = function () {
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value.trim();
-    const msg = document.getElementById("msg");
+document.getElementById("registerBtn").onclick = async () => {
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const msg = document.getElementById("msg");
 
-    let users = JSON.parse(localStorage.getItem("users")) || {};
+  if (!username || !password) {
+    msg.innerText = "Username aur Password bhariye!";
+    return;
+  }
 
-    if (users[username] && users[username] === password) {
+  const ref = doc(db, "users", username);
+  const snap = await getDoc(ref);
 
-        localStorage.setItem("currentUser", username);
+  if (snap.exists()) {
+    msg.innerText = "Username pehle se hai!";
+    return;
+  }
 
-        msg.style.color = "green";
-        msg.innerText = "Login Successful!";
+  await setDoc(ref, { password });
 
-        setTimeout(function () {
-            window.location.href = "chat.html";
-        }, 500);
+  msg.style.color = "green";
+  msg.innerText = "Account ban gaya!";
+};
 
-    } else {
+document.getElementById("loginBtn").onclick = async () => {
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const msg = document.getElementById("msg");
 
-        msg.style.color = "red";
-        msg.innerText = "Galat Username ya Password!";
+  const ref = doc(db, "users", username);
+  const snap = await getDoc(ref);
 
-    }
+  if (!snap.exists()) {
+    msg.innerText = "Username nahi mila!";
+    return;
+  }
 
+  if (snap.data().password !== password) {
+    msg.innerText = "Galat Password!";
+    return;
+  }
+
+  localStorage.setItem("currentUser", username);
+  window.location.href = "chat.html";
 };
