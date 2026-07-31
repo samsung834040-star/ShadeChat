@@ -4,11 +4,33 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ShadeChat</title>
+
 <link rel="stylesheet" href="style.css">
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+
+const firebaseConfig = {
+apiKey: "AIzaSyCkIDDZPZW2wUyxxYI8uN-lpGv58m0LTS8",
+authDomain: "shade-85.firebaseapp.com",
+projectId: "shade-85",
+storageBucket: "shade-85.firebasestorage.app",
+messagingSenderId: "370950187569",
+appId: "1:370950187569:web:aa8f05b3ef8a0f1bd54310",
+measurementId: "G-WJNJ2HEMLT"
+};
+
+initializeApp(firebaseConfig);
+
+</script>
+
 </head>
+
 <body>
 
 <div class="login">
+
 <h1>ShadeChat</h1>
 
 <input type="text" id="username" placeholder="Username">
@@ -23,7 +45,7 @@
 
 </div>
 
-<script src="script.js"></script>
+<script type="module" src="script.js"></script>
 
 </body>
 </html>
