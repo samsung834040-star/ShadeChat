@@ -31,7 +31,7 @@ document.getElementById("welcome").innerText = "Welcome, " + currentUser;
 
 const chatBox = document.getElementById("chatBox");
 
-const q = query(collection(db, "messages"), orderBy("time"));
+const q = collection(db, "messages");
 
 onSnapshot(q, (snapshot) => {
   chatBox.innerHTML = "";
