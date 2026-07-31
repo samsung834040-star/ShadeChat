@@ -1,58 +1,61 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  query,
+  orderBy,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCkIDDZPZW2wUyxxYI8uN-lpGv58m0LTS8",
+  authDomain: "shade-85.firebaseapp.com",
+  projectId: "shade-85",
+  storageBucket: "shade-85.firebasestorage.app",
+  messagingSenderId: "370950187569",
+  appId: "1:370950187569:web:aa8f05b3ef8a0f1bd54310",
+  measurementId: "G-WJNJ2HEMLT"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 const currentUser = localStorage.getItem("currentUser");
 
 if (!currentUser) {
-    window.location.href = "index.html";
+  location.href = "index.html";
 }
 
-document.getElementById("welcome").innerText =
-"Welcome, " + currentUser;
-
-let messages = JSON.parse(localStorage.getItem("messages")) || [];
+document.getElementById("welcome").innerText = "Welcome, " + currentUser;
 
 const chatBox = document.getElementById("chatBox");
 
-function showMessages() {
+const q = query(collection(db, "messages"), orderBy("time"));
 
-    chatBox.innerHTML = "";
+onSnapshot(q, (snapshot) => {
+  chatBox.innerHTML = "";
+  snapshot.forEach((doc) => {
+    const data = doc.data();
+    chatBox.innerHTML += `<p><b>${data.user}:</b> ${data.text}</p>`;
+  });
+  chatBox.scrollTop = chatBox.scrollHeight;
+});
 
-    messages.forEach(function(msg){
+document.getElementById("sendBtn").onclick = async () => {
+  const text = document.getElementById("message").value.trim();
+  if (!text) return;
 
-        let p = document.createElement("p");
-        p.innerText = msg.user + " : " + msg.text;
+  await addDoc(collection(db, "messages"), {
+    user: currentUser,
+    text: text,
+    time: Date.now()
+  });
 
-        chatBox.appendChild(p);
-
-    });
-
-    chatBox.scrollTop = chatBox.scrollHeight;
-
-}
-
-showMessages();
-
-document.getElementById("sendBtn").onclick = function(){
-
-    const text = document.getElementById("message").value.trim();
-
-    if(text==="") return;
-
-    messages.push({
-        user: currentUser,
-        text: text
-    });
-
-    localStorage.setItem("messages", JSON.stringify(messages));
-
-    document.getElementById("message").value="";
-
-    showMessages();
-
+  document.getElementById("message").value = "";
 };
 
-document.getElementById("logoutBtn").onclick = function(){
-
-    localStorage.removeItem("currentUser");
-
-    window.location.href="index.html";
-
+document.getElementById("logoutBtn").onclick = () => {
+  localStorage.removeItem("currentUser");
+  location.href = "index.html";
 };
